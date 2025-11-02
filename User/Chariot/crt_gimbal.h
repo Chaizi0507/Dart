@@ -19,11 +19,13 @@
 #include "dvc_minipc.h"
 #include "dvc_imu.h"
 #include "dvc_lkmotor.h"
+#include "alg_fsm.h"
 
 /* Exported macros -----------------------------------------------------------*/
 
 /* Exported types ------------------------------------------------------------*/
 
+class Class_Gimbal;
 
 /**
  * @brief 云台控制类型
@@ -34,6 +36,22 @@ enum Enum_Gimbal_Control_Type :uint8_t
     Gimbal_Control_Type_DISABLE = 0,
     Gimbal_Control_Type_NORMAL,
     Gimbal_Control_Type_MINIPC,
+};
+
+/**
+ * @brief Specialized, Yaw轴校准有限自动机
+ *
+ */
+class Class_FSM_Yaw_Calibration : public Class_FSM
+{
+public:
+    Class_Gimbal *Gimbal;
+
+    float Torque_Threshold = 0.0f;
+    float Angle_Left = 0.0f;
+    float Angle_Right = 0.0f;
+
+    void Reload_TIM_Status_PeriodElapsedCallback();
 };
 
 /**
@@ -48,6 +66,9 @@ public:
     Class_IMU Boardc_BMI;
 
     Class_MiniPC *MiniPC;
+
+    Class_FSM_Yaw_Calibration FSM_Yaw_Calibration;
+    friend class Class_FSM_Yaw_Calibration;
 
     Class_DJI_Motor_C610 Motor_Pitch_L;
     Class_DJI_Motor_C610 Motor_Pitch_R;
@@ -70,9 +91,9 @@ protected:
 
     //常量
     // yaw轴最小值
-    float Min_Yaw_Angle = - 180.0f;
+    float Min_Yaw_Angle = - 10.0f;
     // yaw轴最大值
-    float Max_Yaw_Angle = 180.0f;
+    float Max_Yaw_Angle = 10.0f;
 
     //yaw总角度
     float Yaw_Total_Angle;

@@ -171,12 +171,16 @@ void Gimbal_Device_CAN1_Callback(Struct_CAN_Rx_Buffer *CAN_RxMessage)
     break;
     case (0x201):
     {
-        
+        //test
+        chariot.Gimbal.Motor_Pitch_R.CAN_RxCpltCallback(CAN_RxMessage->Data);
     }
     break;
     case (0x202):
     {
-        chariot.Booster.Motor_Shoot.CAN_RxCpltCallback(CAN_RxMessage->Data);
+        //chariot.Booster.Motor_Shoot.CAN_RxCpltCallback(CAN_RxMessage->Data);
+
+        //test
+        chariot.Gimbal.Motor_Pitch_L.CAN_RxCpltCallback(CAN_RxMessage->Data);
     }
     break;
     case (0x205):
@@ -319,12 +323,23 @@ void Ist8310_IIC3_Callback(uint8_t* Tx_Buffer, uint8_t* Rx_Buffer, uint16_t Tx_L
  * @param Buffer UART收到的消息
  * @param Length 长度
  */
-#ifdef CHASSIS
+
 void Referee_UART6_Callback(uint8_t *Buffer, uint16_t Length)
 {
     chariot.Referee.UART_RxCpltCallback(Buffer,Length);
 }
-#endif
+/**
+ * @brief UART1拉力机回调函数
+ *
+ * @param Buffer UART收到的消息
+ * @param Length 长度
+ */
+
+void Tension_UART1_Callback(uint8_t *Buffer, uint16_t Length)
+{
+    
+}
+
 /**
  * @brief UART1超电回调函数
  *
@@ -401,8 +416,6 @@ void Task1ms_TIM5_Callback()
         #endif
         //调试用
 
-        
-
         chariot.TIM_Calculate_PeriodElapsedCallback();
         
     /****************************** 驱动层回调函数 1ms *****************************************/ 
@@ -416,7 +429,7 @@ void Task1ms_TIM5_Callback()
         if (mod5 == 5)
         {
             TIM_USB_PeriodElapsedCallback(&MiniPC_USB_Manage_Object);
-        mod5 = 0;
+            mod5 = 0;
         }	        
     }
 }
@@ -437,8 +450,7 @@ extern "C" void Task_Init()
         CAN_Init(&hcan1, Chassis_Device_CAN1_Callback);
         CAN_Init(&hcan2, Chassis_Device_CAN2_Callback);
 
-        //裁判系统
-        UART_Init(&huart6, Referee_UART6_Callback, 128);   //并未使用环形队列 尽量给长范围增加检索时间 减少丢包
+        
 
         #ifdef POWER_LIMIT
         //旧版超电
@@ -462,7 +474,9 @@ extern "C" void Task_Init()
         //遥控器接收
         #ifdef USE_DR16
         UART_Init(&huart3, DR16_UART3_Callback, 18);
-		UART_Init(&huart6, Image_UART6_Callback, 40);
+		//裁判系统
+        UART_Init(&huart6, Referee_UART6_Callback, 128);   //并未使用环形队列 尽量给长范围增加检索时间 减少丢包
+        UART_Init(&huart1, Tension_UART1_Callback, 128);
         #elif defined(USE_VT13)
         UART_Init(&huart6, VT13_UART_Callback, 30);
         #endif

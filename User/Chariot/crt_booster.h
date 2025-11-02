@@ -49,45 +49,9 @@ enum Enum_Booster_User_Control_Type
     Booster_User_Control_Type_MULTI, // 连发
 };
 
-/**
- * @brief 摩擦轮控制类型
- *
- */
-enum Enum_Friction_Control_Type
-{
-    Friction_Control_Type_DISABLE = 0,
-    Friction_Control_Type_ENABLE,
-};
-
 
 /**
- * @brief Specialized, 热量检测有限自动机
- *
- */
-class Class_FSM_Heat_Detect : public Class_FSM
-{
-public:
-    Class_Booster *Booster;
-
-    float Heat;
-
-    void Reload_TIM_Status_PeriodElapsedCallback();
-};
-
-/**
- * @brief Specialized, 卡弹策略有限自动机
- *
- */
-class Class_FSM_Antijamming : public Class_FSM
-{
-public:
-    Class_Booster *Booster;
-
-    void Reload_TIM_Status_PeriodElapsedCallback();
-};
-
-/**
- * @brief Specialized, 卡弹策略有限自动机
+ * @brief Specialized, 发射策略有限自动机
  *
  */
 class Class_FSM_Shooting : public Class_FSM
@@ -98,6 +62,7 @@ public:
     void Reload_TIM_Status_PeriodElapsedCallback();
 };
 
+
 /**
  * @brief Specialized, 发射机构类
  *
@@ -105,13 +70,6 @@ public:
 class Class_Booster
 {
 public:
-    //热量检测有限自动机
-    Class_FSM_Heat_Detect FSM_Heat_Detect;
-    friend class Class_FSM_Heat_Detect;
-
-    //卡弹策略有限自动机
-    Class_FSM_Antijamming FSM_Antijamming;
-    friend class Class_FSM_Antijamming;
 
     //发射有限自动机
     Class_FSM_Shooting FSM_Shooting;
@@ -120,16 +78,8 @@ public:
     //裁判系统
     Class_Referee *Referee;
 
-    //拨弹盘电机
-    Class_DJI_Motor_C610 Motor_Driver;
-
-    //摩擦轮电机左
-    Class_DJI_Motor_C620 Motor_Friction_Left;
-    //摩擦轮电机右
-    Class_DJI_Motor_C620 Motor_Friction_Right;
-
     //发射电机
-    Class_DJI_Motor_C610 Motor_Shoot;
+    Class_DJI_Motor_C610 Motor_Pull;
 
     void Init();
 
@@ -139,10 +89,8 @@ public:
     inline int Get_Measured_Tension();
 
     inline Enum_Booster_Control_Type Get_Booster_Control_Type();
-    inline Enum_Friction_Control_Type Get_Friction_Control_Type();
 
     inline void Set_Booster_Control_Type(Enum_Booster_Control_Type __Booster_Control_Type);
-    inline void Set_Friction_Control_Type(Enum_Friction_Control_Type __Friction_Control_Type);
     inline void Set_Friction_Omega(float __Friction_Omega);
     inline void Set_Driver_Omega(float __Driver_Omega);
     inline void Set_Measured_Tension(int __Measured_Tension);
@@ -178,7 +126,6 @@ protected:
 
     //发射机构状态
     Enum_Booster_Control_Type Booster_Control_Type = Booster_Control_Type_CEASEFIRE;
-    Enum_Friction_Control_Type Friction_Control_Type = Friction_Control_Type_DISABLE;
     //摩擦轮角速度
     float Friction_Omega = 800.0f;
 		
@@ -246,15 +193,6 @@ void Class_Booster::Set_Booster_Control_Type(Enum_Booster_Control_Type __Booster
     Booster_Control_Type = __Booster_Control_Type;
 }
 
-/**
- * @brief 设定发射机构状态
- *
- * @param __Booster_Control_Type 发射机构状态
- */
-void Class_Booster::Set_Friction_Control_Type(Enum_Friction_Control_Type __Friction_Control_Type)
-{
-    Friction_Control_Type = __Friction_Control_Type;
-}
 
 /**
  * @brief 获得发射机构状态
@@ -266,16 +204,6 @@ Enum_Booster_Control_Type Class_Booster::Get_Booster_Control_Type()
     return (Booster_Control_Type);
 }
 
-/**
- * @brief 获得发射机构状态
- *
- * @return Enum_Booster_Control_Type 发射机构状态
- */
-Enum_Friction_Control_Type Class_Booster::Get_Friction_Control_Type()
-{
-    return (Friction_Control_Type);
-
-}
 
 /**
  * @brief 设定摩擦轮角速度

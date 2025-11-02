@@ -652,7 +652,7 @@ void Class_Chariot::TIM1msMod50_Alive_PeriodElapsedCallback()
             Gimbal.Motor_Yaw.TIM_Alive_PeriodElapsedCallback();
             Gimbal.Boardc_BMI.TIM1msMod50_Alive_PeriodElapsedCallback();
 
-            Booster.Motor_Shoot.TIM_Alive_PeriodElapsedCallback();
+            Booster.Motor_Pull.TIM_Alive_PeriodElapsedCallback();
 						
 			MiniPC.TIM1msMod50_Alive_PeriodElapsedCallback();
 
